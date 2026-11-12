@@ -1,0 +1,23 @@
+# Config gitleaks pour le scan hebdo (ajuster au fil des faux positifs).
+# Les secrets détectés sont MASQUÉS dans les rapports (--redact).
+
+title = "secret-scan VPS rennesdev"
+
+# Faux positifs connus à ignorer (placeholders de doc, exemples)
+[allowlist]
+  description = "Placeholders et exemples de documentation"
+  regexes = [
+    '''(?i)ghp_ton_token_github_ici''',
+    '''(?i)github_pat_xxx''',
+    '''(?i)sk-ant-api03-xxxx''',
+    '''(?i)whsec_xxxx''',
+    '''(?i)tly-xxxx''',
+    '''(?i)exemple\\.com''',
+    '''(?i)votre[_-]token''',
+    '''(?i)xxx+''',
+  ]
+  paths = [
+    '''(?i)docs/''',
+    '''(?i)\.example$''',
+    '''(?i)exemple''',
+  ]
