@@ -52,26 +52,26 @@ def api(url, pat):
         return json.load(r)
 
 
-def git(mirror, args, pat):
-    # extraHeader en CLI uniquement : le token n'est jamais écrit dans .git/config
-    cmd = ["git", "-C", mirror, "-c", f"http.extraHeader=Authorization: Bearer {pat}"] + args
-    return subprocess.run(cmd, capture_output=True, text=True, timeout=600)
+def git_base(pat):
+    # credential helper INLINE (-c en CLI) : le PAT n'est jamais persisté dans .git/config
+    helper = "!f() { echo username=x-access-token; echo password=%s; }; f" % pat
+    return ["git", "-c", f"credential.helper={helper}"]
 
 
 def ensure_mirror(full, pat):
     name = full.replace("/", "_")
     mirror = os.path.join(CACHE, name + ".git")
+    env = dict(os.environ, GIT_TERMINAL_PROMPT="0")
     if os.path.isdir(mirror):
-        r = git(mirror, ["remote", "update", "--prune"], pat)
+        r = subprocess.run(git_base(pat) + ["-C", mirror, "remote", "update", "--prune"],
+                           capture_output=True, text=True, timeout=600, env=env)
         if r.returncode != 0:
             print(f"  (remote update KO pour {full}, on rescanne le cache: {r.stderr[:120]})", file=sys.stderr)
     else:
         os.makedirs(CACHE, exist_ok=True)
-        r = subprocess.run(
-            ["git", "clone", "--mirror", "-q",
-             "-c", f"http.extraHeader=Authorization: Bearer {pat}",
-             f"https://github.com/{full}.git", mirror],
-            capture_output=True, text=True, timeout=1200)
+        r = subprocess.run(git_base(pat) + ["clone", "--mirror", "-q",
+                                            f"https://github.com/{full}.git", mirror],
+                           capture_output=True, text=True, timeout=1200, env=env)
         if r.returncode != 0:
             print(f"  clone KO: {full}: {r.stderr[:200]}", file=sys.stderr)
             return None
