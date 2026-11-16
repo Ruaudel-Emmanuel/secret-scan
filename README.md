@@ -21,14 +21,6 @@ supprimés depuis) de tous les dépôts actifs, avec [gitleaks](https://github.c
 - Si un vrai secret est trouvé : le révoquer immédiatement (GitHub/settings/tokens, Mistral, etc.),
   purger l'historique (`git filter-repo`), puis le noter dans une issue privée de ce repo.
 
-## 🚀 Utilisation manuelle
-
-```bash
-sudo python3 /home/ubuntu/projects/secret-scan/scan_secrets.py --repo rennesdev-vps-ops   # test 1 dépôt
-sudo python3 /home/ubuntu/projects/secret-scan/scan_secrets.py --max-repos 3              # test rapide
-sudo python3 /home/ubuntu/projects/secret-scan/scan_secrets.py                              # scan complet
-```
-
 Prérequis VPS : `gitleaks` ≥ 8.x dans `/usr/local/bin/gitleaks`, `git`, PAT (Contents: Read).
 
 ## ⏰ Cron (VPS)
